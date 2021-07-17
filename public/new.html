@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimal-ui"
+    />
+    <title>HotMap</title>
+    <!-- Google Fonts -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <!-- CSS Reset -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <!-- Milligram CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+    <link rel="stylesheet" href="main.css" />
+    <script>
+      function getPosition(options) {
+        return new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, options)
+        );
+      }
+
+      async function getLoc() {
+        const mapLink = document.querySelector("#map-link");
+        const sendButton = document.querySelector("#send-button");
+        sendButton.disabled = true;
+
+        if (!navigator.geolocation) {
+          mapLink.style.color = "red";
+          mapLink.textContent = "Unavailable, have you enabled location?";
+          return;
+        }
+
+        try {
+          mapLink.textContent = "Busy locating…";
+          const position = await getPosition();
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          const latField = document.querySelector("#lat-field");
+          const lngField = document.querySelector("#lng-field");
+          latField.value = lat;
+          lngField.value = lng;
+
+          mapLink.href = `https://www.openstreetmap.org/#map=18/${lat}/${lng}`;
+          mapLink.style.color = "green";
+          mapLink.textContent = "Location found, click to see (optional)";
+          sendButton.disabled = false;
+        } catch (err) {
+          mapLink.style.color = "red";
+          mapLink.textContent = "Error, have you enabled location?";
+        }
+      }
+    </script>
+  </head>
+  <body onload="getLoc()">
+    <main class="wrapper">
+      <nav class="navigation">
+        <section class="container">
+          <ul class="navigation-list float-right">
+            <li class="navigation-item">
+              <a class="navigation-link" href="/">Live map</a>
+            </li>
+            <li class="navigation-item">
+              <a class="navigation-link" href="/feed.html">Nearby reports</a>
+            </li>
+            <li class="navigation-item">
+              <a class="navigation-link" href="/new.html">New report</a>
+            </li>
+          </ul>
+        </section>
+      </nav>
+      <section id="docs" class="container">
+        <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
+        <p>
+          <b>N.B.</b> You must have location enabled on your device and
+          physically be near the scene to send a valid report. Reports are
+          anonymous. You can send one report per device every 2 hours.
+        </p>
+      </section>
+      <section class="container">
+        <form action="/reports" method="post">
+          <fieldset>
+            <label for="num-indiv-field"
+              >Near my current location I observed about</label
+            >
+            <input
+              id="num-indiv-field"
+              name="num-indiv-field"
+              type="number"
+              placeholder="e.g. 50"
+              required
+            />
+
+            <label for="obs-field">people who</label>
+            <select id="obs-field" name="obs-field" required>
+              <option value="T">are doing nothing, I'm just testing</option>
+              <option value="S">I suspect will loot or vandalise</option>
+              <option value="L">are looting or vandalising</option>
+              <option value="O">are doing something else (add notes)</option>
+            </select>
+
+            <label for="dir-field">and are moving</label>
+            <select id="dir-field" name="dir-field">
+              <option value="">nowhere / I can't say</option>
+              <option value="N">North</option>
+              <option value="E">East</option>
+              <option value="S">South</option>
+              <option value="W">West</option>
+            </select>
+            <label for="notes-field">Extra notes (optional)</label>
+            <textarea
+              placeholder="e.g. people injured, people armed"
+              id="notes-field"
+              name="notes-field"
+            ></textarea>
+
+            <label for="map-link">Location status: </label>
+            <a id="map-link" target="_blank">not yet found.</a>
+
+            <input type="hidden" id="lat-field" name="lat-field" />
+            <input type="hidden" id="lng-field" name="lng-field" />
+          </fieldset>
+          <input
+            id="send-button"
+            class="button-primary float-right"
+            type="submit"
+            value="Send"
+          />
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

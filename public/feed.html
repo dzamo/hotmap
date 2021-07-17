@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimal-ui"
+    />
+    <title>HotMap</title>
+    <!-- Google Fonts -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <!-- CSS Reset -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <!-- Milligram CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+    <link rel="stylesheet" href="main.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      function getPosition(options) {
+        return new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, options)
+        );
+      }
+
+      OBS = {
+        S: "Suspected",
+        L: "Looting",
+        O: "Other",
+        T: "Testing,ignore",
+      };
+
+      async function loadReports() {
+        var resp;
+
+        try {
+          const position = await getPosition();
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          resp = await axios.get(`/reports?lat=${lat}&lng=${lng}`);
+        } catch (err) {
+          console.log("Location not found, fetching all reports.");
+          resp = await axios.get("/reports");
+        } finally {
+          var tbodyHtml = "";
+          resp.data.map(function (d) {
+            shortTime = d.created.substring(0, d.created.indexOf("."));
+            tbodyHtml += `
+	      	<tr>
+	        	<td>${shortTime}</td>
+	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}">${d.lat}, ${
+              d.lng
+            }</a></td>
+	        	<td>${d.num_indiv}</td>
+	        	<td>${OBS[d.obs]}</td>
+	        	<td>${d.dir}</td>
+	        	<td>${d.notes}</td>
+	        </tr>
+	      `;
+          });
+          document.querySelector("#reportTable tbody").innerHTML = tbodyHtml;
+        }
+      }
+    </script>
+  </head>
+  <body onload="loadReports()">
+    <main class="wrapper">
+      <nav class="navigation">
+        <section class="container">
+          <ul class="navigation-list float-right">
+            <li class="navigation-item">
+              <a class="navigation-link" href="/">Live map</a>
+            </li>
+            <li class="navigation-item">
+              <a class="navigation-link" href="/feed.html">Nearby reports</a>
+            </li>
+            <li class="navigation-item">
+              <a class="navigation-link" href="/new.html">New report</a>
+            </li>
+          </ul>
+        </section>
+      </nav>
+      <section id="docs" class="container">
+        <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
+        <p>
+          Table of reports from the last 24 hours, and within about 5km of your
+          location if it was provided. Click on coordinates to show them on the
+          map.
+        </p>
+        <table id="reportTable">
+          <thead>
+            <th>Reported</th>
+            <th>Location</th>
+            <th>Individuals</th>
+            <th>Observation</th>
+            <th>Moving</th>
+            <th>Notes</th>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
