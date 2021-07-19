@@ -30,9 +30,7 @@ type
     id: int
     lat: float
     lng: float
-    num_indiv: int
     obs: string
-    dir: string
     notes: string
     sender_ip: string
     created: string # TODO: use DateTime?
@@ -40,16 +38,14 @@ type
 
 proc save_report(report: Report) =
     const insert_sql = sql"""
-        insert into report(lat, lng, num_indiv, obs, dir, notes, sender_ip)
-        values(?,?,?,?,?,?,?)
+        insert into report(lat, lng, obs, notes, sender_ip)
+        values(?,?,?,?,?)
         """
 
     db.exec(insert_sql,
         report.lat,
         report.lng,
-        report.num_indiv,
         report.obs,
-        report.dir,
         report.notes,
         report.sender_ip
     )
@@ -80,9 +76,7 @@ routes:
         let report = Report(
             lat: parse_float(params["lat-field"]),
             lng: parse_float(params["lng-field"]),
-            num_indiv: parse_int(params["num-indiv-field"]),
             obs: params["obs-field"],
-            dir: params["dir-field"],
             notes: params["notes-field"],
             sender_ip: request.ip
         )
@@ -92,33 +86,35 @@ routes:
         
     get "/reports":
         let params = request.params()
-        var lat, lng, geo_search = ""
-        if params.has_key("lat") and params.has_key("lng"):
-            lat = params["lat"]
-            lng = params["lng"]
-            geo_search = fmt"and point(lat, lng) <@> point({lat}, {lng}) < 0.62137119 * 5"
-
-        var reports = new_seq[Report](0)
+        var and_geo_search: string
+        
+        try:
+            let lat = parse_float(params["lat"])
+            let lng = parse_float(params["lng"])
+            and_geo_search = fmt"and point(lat, lng) <@> point({lat}, {lng}) < 0.62137119 * 5"
+        except ValueError:
+            and_geo_search = ""
 
         let query = sql(fmt(
             """select *
             from report
-            where obs <> 'T'
-            and created >= current_timestamp - interval '30' day {geo_search}
+            where obs = ?
+            and created >= current_timestamp - interval ? hour
+            {and_geo_search}
             order by created desc"""
         ))
 
-        for row in db.fast_rows(query):
+        var reports = new_seq[Report](0)
+
+        for row in db.fast_rows(query, params["obs"], params["period"]):
             let report = Report(
                 id: parse_int(row[0]),
                 lat: parse_float(row[1]),
                 lng: parse_float(row[2]),
-                num_indiv: parse_int(row[3]),
-                obs: row[4],
-                dir: row[5],
-                notes: row[6],
-                sender_ip: row[7],
-                created: row[8]
+                obs: row[3],
+                notes: row[4],
+                sender_ip: row[5],
+                created: row[6]
             )
             reports.add(report)
             
@@ -126,20 +122,24 @@ routes:
         resp  %*(reports)
 
     get "/hot-spots":
-        const query = sql"select * from hot_spot"
+        let params = request.params()
+
+        const query = sql"""
+            select *
+            from hot_spot
+            where obs = ?
+            and created >= current_timestamp - interval ? hour"""
         var reports = new_seq[Report](0)
 
-        for row in db.fast_rows(query):
+        for row in db.fast_rows(query, params["obs"], params["period"]):
             let report = Report(
                 id: parse_int(row[0]),
                 lat: parse_float(row[1]),
                 lng: parse_float(row[2]),
-                num_indiv: parse_int(row[3]),
-                obs: row[4],
-                dir: row[5],
-                notes: row[6],
-                created: row[7],
-                temp: parse_float(row[8])
+                obs: row[3],
+                notes: row[4],
+                created: row[5],
+                temp: parse_float(row[6])
             )
             reports.add(report)
             

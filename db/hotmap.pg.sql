@@ -1,11 +1,9 @@
--- drop table report;
+--drop table report cascade;
 create table report (
 	id serial primary key,
 	lat float not null,
 	lng float not null,
-	num_indiv int not null,
 	obs text not null,
-	dir text,
 	notes text,
 	sender_ip text,
 	created timestamp not null default now()
@@ -18,7 +16,7 @@ select
 from
 	report
 where
-	obs <> 'T'
+	obs <> 'testing'
 	and created >= current_timestamp - interval '30' day),
 adjacent as (
 select
@@ -32,9 +30,7 @@ select
 	id,
 	lat,
 	lng,
-	num_indiv,
 	obs,
-	dir,
 	notes,
 	created,
 	log(1+count(*)) as "temp" -- temperature
@@ -44,9 +40,7 @@ group by
 	id,
 	lat,
 	lng,
-	num_indiv,
 	obs,
-	dir,
 	notes,
 	created;
 

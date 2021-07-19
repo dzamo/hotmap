@@ -35,39 +35,46 @@
       crossorigin=""
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="main.js"></script>
     <script>
-      function getPosition(options) {
-        return new Promise((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, options)
-        );
-      }
+      var heatmapLayer,
+        lat = -26.1069,
+        lng = 28.104,
+        zoom = 10;
 
-      async function loadHeatMap(lat, lng, zoom) {
-        let baseLayer = L.tileLayer(
+      function createMap() {
+        const baseLayer = L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           {
             attribution:
               'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a>',
           }
         );
-        let cfg = {
+        const cfg = {
           radius: 20,
           scaleRadius: false,
           useLocalExtrema: true,
           valueField: "temp",
         };
-        let heatmapLayer = new HeatmapOverlay(cfg);
-        let resp = await axios.get("/hot-spots");
-        let reports = resp.data;
+        heatmapLayer = new HeatmapOverlay(cfg);
 
-        let propertyHeatMap = new L.Map("map", {
+        const propertyHeatMap = new L.Map("map", {
           center: new L.LatLng(lat, lng),
-          zoom: zoom || 10,
+          zoom: zoom,
           layers: [baseLayer, heatmapLayer],
         });
+      }
+
+      async function loadHotSpotData() {
+        const obs = document.querySelector("#obs-field").value;
+        const period = document.querySelector("#period-field").value;
+
+        const resp = await axios.get(
+          `/hot-spots?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}`
+        );
 
         heatmapLayer.setData({
-          data: reports,
+          data: resp.data,
         });
       }
     </script>
@@ -90,19 +97,40 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
+        <h4>🇿🇦 Crowdsourced hot spots.</h4>
         <p>
           The map temperature increases with the number of reports.
           <b>Your reports power this map</b>, use the menu above to send a
-          report whenever you are near a threat.
+          report whenever you are near a site of one of the sorts below. Send
+          repeat reports up to every two hours per device to keep the map
+          accurate.
         </p>
-
-        <label for="period-field">Show reports from the last</label>
-        <select id="period-field" name="period-field" required>
-          <option disabled value="1">1 hour</option>
-          <option disabled value="4">4 hours</option>
-          <option disabled value="24">24 hours</option>
-          <option value="720">30 days</option>
+        <label for="obs-field">Show reports of</label>
+        <select
+          id="obs-field"
+          name="obs-field"
+          required
+          onchange="loadHotSpotData()"
+        >
+          <option value="covid_vac">COVID-19 vaccination for walk-ins</option>
+          <option selected value="crime">
+            suspicious or criminal activity
+          </option>
+          <option value="supplies">charity or emergency relief supplies</option>
+          <option value="fire">uncontrolled fire</option>
+          <option value="weather">extreme weather</option>
+        </select>
+        <label for="period-field">from the last</label>
+        <select
+          id="period-field"
+          name="period-field"
+          required
+          onchange="loadHotSpotData()"
+        >
+          <option value="1">1 hour</option>
+          <option value="4">4 hours</option>
+          <option value="24">24 hours</option>
+          <option selected value="720">30 days</option>
         </select>
         <div id="map"></div>
         <script
@@ -113,15 +141,13 @@
         <script src="https://cdn.jsdelivr.net/npm/leaflet-heatmap@1.0.0/leaflet-heatmap.min.js"></script>
         <script>
           window.onload = async function () {
-            // default map centre
-            var lat = -26.1069,
-              lng = 28.104;
-
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has("lat") && urlParams.has("lng")) {
               lat = urlParams.get("lat");
               lng = urlParams.get("lng");
-              loadHeatMap(lat, lng, 16);
+              zoom = 16;
+              createMap();
+              loadHotSpotData();
             } else {
               try {
                 const position = await getPosition();
@@ -130,7 +156,8 @@
               } catch (err) {
                 console.log("Location not found, using default map centre.");
               } finally {
-                loadHeatMap(lat, lng, null);
+                createMap();
+                loadHotSpotData();
               }
             }
           };

@@ -23,13 +23,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
     />
     <link rel="stylesheet" href="main.css" />
+    <script src="main.js"></script>
     <script>
-      function getPosition(options) {
-        return new Promise((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, options)
-        );
-      }
-
       async function getLoc() {
         const mapLink = document.querySelector("#map-link");
         const sendButton = document.querySelector("#send-button");
@@ -61,6 +56,12 @@
           mapLink.textContent = "Error, have you enabled location?";
         }
       }
+
+      function obsChanged(obsField) {
+        const notesField = document.querySelector("#notes-field");
+        notesField.placeholder = NOTES_EGS[obsField.value];
+        notesField.disabled = obsField.value == "testing";
+      }
     </script>
   </head>
   <body onload="getLoc()">
@@ -81,51 +82,40 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
+        <h4>🇿🇦 Crowdsourced hot spots.</h4>
         <p>
           <b>N.B.</b> You must have location enabled on your device and
-          physically be near the scene to send a valid report. You can send one
-          report per device every 2 hours. Reports filed here are anonymous and
-          have no legal status, you must still
-          <a href="https://www.saps.gov.za/crimestop/crimestop.php">
-            report a crime that you have witnessed to the SAPS</a
-          >.
+          physically be near the site to send a valid report. Reports filed here
+          are anonymous, are freely accessible by the public and are not
+          forwarded to any emergency management service. You must still report
+          emergencies and crimes to the appropriate office.
         </p>
       </section>
       <section class="container">
         <form action="/reports" method="post">
           <fieldset>
-            <label for="num-indiv-field"
-              >Near my current location I observed about</label
-            >
-            <input
-              id="num-indiv-field"
-              name="num-indiv-field"
-              type="number"
-              placeholder="e.g. 50"
+            <label for="obs-field">Near my current location I observed</label>
+            <select
+              id="obs-field"
+              name="obs-field"
               required
-            />
-
-            <label for="obs-field">people who</label>
-            <select id="obs-field" name="obs-field" required>
-              <option value="T">are doing nothing, I'm just testing</option>
-              <option value="S">I suspect will soon commit a crime</option>
-              <option value="L">have comitted a crime</option>
+              onchange="obsChanged(this)"
+            >
+              <option value="testing">nothing, I'm just testing</option>
+              <option value="crime">suspicious or criminal activity</option>
+              <option value="covid_vac">
+                COVID-19 vaccination for walk-ins
+              </option>
+              <option value="fire">uncontrolled fire</option>
+              <option value="weather">extreme weather</option>
             </select>
 
-            <label for="dir-field">and are moving</label>
-            <select id="dir-field" name="dir-field">
-              <option value="">nowhere / I don't know</option>
-              <option value="N">North</option>
-              <option value="E">East</option>
-              <option value="S">South</option>
-              <option value="W">West</option>
-            </select>
             <label for="notes-field">Extra notes (optional)</label>
             <textarea
-              placeholder="E.g. looting, arson, people injured, suspects armed, red BMW"
               id="notes-field"
               name="notes-field"
+              disabled
+              placeholder="This field will be enabled when you select an observation."
             ></textarea>
 
             <label for="map-link">Location status: </label>

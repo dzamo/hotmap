@@ -24,31 +24,25 @@
     />
     <link rel="stylesheet" href="main.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="main.js"></script>
     <script>
-      function getPosition(options) {
-        return new Promise((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, options)
-        );
-      }
-
-      OBS = {
-        S: "Suspicious",
-        W: "Witnessed crime",
-        T: "Testing,ignore",
-      };
-
-      async function loadReports() {
-        var resp;
+      async function loadReportsTable() {
+        var lat = "",
+          lng = "";
 
         try {
           const position = await getPosition();
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          resp = await axios.get(`/reports?lat=${lat}&lng=${lng}`);
+          lat = position.coords.latitude;
+          lng = position.coords.longitude;
         } catch (err) {
           console.log("Location not found, fetching all reports.");
-          resp = await axios.get("/reports");
         } finally {
+          const obs = document.querySelector("#obs-field").value;
+          const period = document.querySelector("#period-field").value;
+
+          const resp = await axios.get(
+            `/reports?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}`
+          );
           var tbodyHtml = "";
           resp.data.map(function (d) {
             shortTime = d.created.substring(0, d.created.indexOf("."));
@@ -58,9 +52,7 @@
 	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}">${d.lat}, ${
               d.lng
             }</a></td>
-	        	<td>${d.num_indiv}</td>
 	        	<td>${OBS[d.obs]}</td>
-	        	<td>${d.dir}</td>
 	        	<td>${d.notes}</td>
 	        </tr>
 	      `;
@@ -70,7 +62,7 @@
       }
     </script>
   </head>
-  <body onload="loadReports()">
+  <body onload="loadReportsTable()">
     <main class="wrapper">
       <nav class="navigation">
         <section class="container">
@@ -88,25 +80,43 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
+        <h4>🇿🇦 Crowdsourced hot spots.</h4>
         <p>
           Table of reports sent from within 5km of your location. Click on
           coordinates to show them on the map.
         </p>
-        <label for="period-field">Show reports from the last</label>
-        <select id="period-field" name="period-field" required>
-          <option disabled value="1">1 hour</option>
-          <option disabled value="4">4 hours</option>
-          <option disabled value="24">24 hours</option>
-          <option value="720">30 days</option>
+        <label for="obs-field">Show reports of</label>
+        <select
+          id="obs-field"
+          name="obs-field"
+          required
+          onchange="loadReportsTable()"
+        >
+          <option value="covid_vac">COVID-19 vaccination for walk-ins</option>
+          <option selected value="crime">
+            suspicious or criminal activity
+          </option>
+          <option value="fire">uncontrolled fire</option>
+          <option value="supplies">charity or emergency relief supplies</option>
+          <option value="weather">extreme weather</option>
+        </select>
+        <label for="period-field">from the last</label>
+        <select
+          id="period-field"
+          name="period-field"
+          required
+          onchange="loadReportsTable()"
+        >
+          <option value="1">1 hour</option>
+          <option value="4">4 hours</option>
+          <option value="24">24 hours</option>
+          <option selected value="720">30 days</option>
         </select>
         <table id="reportTable">
           <thead>
             <th>Reported</th>
             <th>Location</th>
-            <th>Individuals</th>
             <th>Observation</th>
-            <th>Moving</th>
             <th>Notes</th>
           </thead>
           <tbody></tbody>
