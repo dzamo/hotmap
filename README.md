@@ -18,7 +18,7 @@ attempt to maintain the heat map's integrity.
 
 ## Building and running
 
-Copy config-example.cfg to config.cfg and edit it for your environment.  The
+Copy config-example.cfg to config.cfg and edit it for your environment. The
 hotmap.nim web service will not launch if it cannot connect to the configured
 pg database.
 

@@ -91,10 +91,16 @@
       <section id="docs" class="container">
         <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
         <p>
-          Table of reports from the last 24 hours, and within about 5km of your
-          location if it was provided. Click on coordinates to show them on the
-          map.
+          Table of reports sent from within 5km of your location. Click on
+          coordinates to show them on the map.
         </p>
+        <label for="period-field">Show reports from the last</label>
+        <select id="period-field" name="period-field" required>
+          <option disabled value="1">1 hour</option>
+          <option disabled value="4">4 hours</option>
+          <option disabled value="24">24 hours</option>
+          <option value="720">30 days</option>
+        </select>
         <table id="reportTable">
           <thead>
             <th>Reported</th>

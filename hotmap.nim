@@ -36,7 +36,7 @@ type
     notes: string
     sender_ip: string
     created: string # TODO: use DateTime?
-    weight : float
+    temp : float
 
 proc save_report(report: Report) =
     const insert_sql = sql"""
@@ -103,7 +103,7 @@ routes:
         let query = sql(fmt(
             """select *
             from report
-            where created >= current_timestamp - interval '1' day {geo_search}
+            where created >= current_timestamp - interval '30' day {geo_search}
             order by created desc"""
         ))
 
@@ -138,7 +138,7 @@ routes:
                 dir: row[5],
                 notes: row[6],
                 created: row[7],
-                weight: parse_float(row[8])
+                temp: parse_float(row[8])
             )
             reports.add(report)
             

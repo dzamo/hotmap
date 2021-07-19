@@ -84,8 +84,12 @@
         <h4>🇿🇦 Crowdsourced criminal threat hot spots.</h4>
         <p>
           <b>N.B.</b> You must have location enabled on your device and
-          physically be near the scene to send a valid report. Reports are
-          anonymous. You can send one report per device every 2 hours.
+          physically be near the scene to send a valid report. You can send one
+          report per device every 2 hours. Reports filed here are anonymous and
+          have no legal status, you must still
+          <a href="https://www.saps.gov.za/crimestop/crimestop.php">
+            report a crime that you have witnessed to the SAPS</a
+          >.
         </p>
       </section>
       <section class="container">
@@ -105,14 +109,13 @@
             <label for="obs-field">people who</label>
             <select id="obs-field" name="obs-field" required>
               <option value="T">are doing nothing, I'm just testing</option>
-              <option value="S">I suspect will loot or vandalise</option>
-              <option value="L">are looting or vandalising</option>
-              <option value="O">are doing something else (add notes)</option>
+              <option value="S">I suspect will soon commit a crime</option>
+              <option value="L">have comitted a crime</option>
             </select>
 
             <label for="dir-field">and are moving</label>
             <select id="dir-field" name="dir-field">
-              <option value="">nowhere / I can't say</option>
+              <option value="">nowhere / I don't know</option>
               <option value="N">North</option>
               <option value="E">East</option>
               <option value="S">South</option>
@@ -120,7 +123,7 @@
             </select>
             <label for="notes-field">Extra notes (optional)</label>
             <textarea
-              placeholder="e.g. people injured, people armed"
+              placeholder="E.g. looting, arson, people injured, suspects armed, red BMW"
               id="notes-field"
               name="notes-field"
             ></textarea>
