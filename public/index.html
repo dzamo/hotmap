@@ -57,7 +57,7 @@
           valueField: "weight",
         };
         let heatmapLayer = new HeatmapOverlay(cfg);
-        let resp = await axios.get("/report-clusters");
+        let resp = await axios.get("/hot-spots");
         let reports = resp.data;
 
         let propertyHeatMap = new L.Map("map", {

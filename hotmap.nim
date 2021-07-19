@@ -1,17 +1,26 @@
 import db_postgres
 import json
-import jester    # Our webserver
-import logging   # Logging utils
-import os        # Used to get arguments
-import parsecfg  # Parse our config file
-import strutils  # Basic functions
-import times     # Time and date
+import jester
+import logging
+import parsecfg
+import strutils
+import times
 import tables
 import strformat
 
 let logger = new_console_logger(lvl_info)
-let db = open("localhost", "hotmap_user", "loot", "hotmap")
-logger.log(lvl_info, "Connected to pg.")
+let dict = load_config("config.cfg")
+
+let db = open(
+    dict.get_section_value("Database", "host"),
+    dict.get_section_value("Database", "user"),
+    dict.get_section_value("Database", "password"),
+    dict.get_section_value("Database", "db")
+)
+logger.log(
+    lvl_info,
+    fmt"""Connected to pg database {dict.get_section_value("Database", "db")}."""
+)
 
 # TODO: this table is wasteful and can grow without bound
 var report_times = init_table[string, int64]()
@@ -30,7 +39,12 @@ type
     weight : float
 
 proc save_report(report: Report) =
-    db.exec(sql"INSERT into report(lat, lng, num_indiv, obs, dir, notes, sender_ip) values(?,?,?,?,?,?,?)",
+    const insert_sql = sql"""
+        insert into report(lat, lng, num_indiv, obs, dir, notes, sender_ip)
+        values(?,?,?,?,?,?,?)
+        """
+
+    db.exec(insert_sql,
         report.lat,
         report.lng,
         report.num_indiv,
@@ -41,8 +55,8 @@ proc save_report(report: Report) =
     )
 
 settings:
-    port = Port(7000)
-    bind_addr = "0.0.0.0"
+    bind_addr = dict.get_section_value("Web_service", "bind_addr")
+    port = Port(parse_int(dict.get_section_value("Web_service", "port")))
 
 routes:
     get "/":
@@ -53,7 +67,11 @@ routes:
         let last_report = report_times.getOrDefault(request.ip)
         
         if now - last_report < 2*60*60:
-            resp(Http429, "You cannot send another report from this device yet, please try again later.")
+            resp(
+                Http429,
+                """"You cannot send another report from this device yet, please
+                try again later."""
+            )
 
         report_times[request.ip] = now
 
@@ -82,10 +100,12 @@ routes:
 
         var reports = new_seq[Report](0)
 
-        echo(fmt"QUERY = select * from report where created >= current_timestamp - interval '1' day {geo_search} order by created desc")
-
-        let query = sql(fmt("select * from report where created >= current_timestamp - interval '1' day {geo_search} order by created desc"))
-        #logging.log(lvl_info, fmt"Executing query {query}")
+        let query = sql(fmt(
+            """select *
+            from report
+            where created >= current_timestamp - interval '1' day {geo_search}
+            order by created desc"""
+        ))
 
         for row in db.fast_rows(query):
             let report = Report(
@@ -104,10 +124,10 @@ routes:
         logger.log(lvl_info, fmt"Returning {len(reports)} reports.")
         resp  %*(reports)
 
-    get "/report-clusters":
+    get "/hot-spots":
+        const query = sql"select * from hot_spot"
         var reports = new_seq[Report](0)
 
-        let query = sql"select * from recent_report_cluster"
         for row in db.fast_rows(query):
             let report = Report(
                 id: parse_int(row[0]),
