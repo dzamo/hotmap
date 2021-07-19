@@ -103,7 +103,8 @@ routes:
         let query = sql(fmt(
             """select *
             from report
-            where created >= current_timestamp - interval '30' day {geo_search}
+            where obs <> 'T'
+            and created >= current_timestamp - interval '30' day {geo_search}
             order by created desc"""
         ))
 
