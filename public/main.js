@@ -1,11 +1,13 @@
 OBS = {
   testing: "Testing, ignore",
   covid_vac: "COVID-19 vaccination for walk-ins",
-  crime: "Suspicious or criminal activity",
-  fire: "Fire",
-  infra: "Damaged property or infrastructure",
   supplies: "Charity or emergency relief supplies",
-  weather: "Extreme weather",
+  crime: "Suspicious or criminal activity",
+  dumping: "Illegal dumping or litter",
+  fire: "Uncontrolled fire",
+  flooding: "Flooding",
+  protest: "Protest or civil unrest",
+  road: "Impassable roads",
 };
 
 NOTES_EGS = {

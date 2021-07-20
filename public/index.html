@@ -53,7 +53,7 @@
         const cfg = {
           radius: 20,
           scaleRadius: false,
-          useLocalExtrema: true,
+          useLocalExtrema: false,
           valueField: "temp",
         };
         heatmapLayer = new HeatmapOverlay(cfg);
@@ -75,6 +75,8 @@
 
         heatmapLayer.setData({
           data: resp.data,
+          min: 0,
+          max: 1,
         });
       }
     </script>
@@ -99,7 +101,7 @@
       <section id="docs" class="container">
         <h4>🇿🇦 Essential South African hot spots</h4>
         <p>
-          The map temperature increases with the number of reports.
+          The map temperature reflects the number of recent reports in an area.
           <b>Your reports power this map</b>, use the menu above to send a
           report whenever you are near a site of one of the sorts below. Send
           repeat reports up to every two hours per device to keep the map
@@ -119,22 +121,23 @@
           <option selected value="crime">
             suspicious or criminal activity
           </option>
+          <option value="dumping">illegal dumping or litter</option>
           <option value="fire">uncontrolled fire</option>
           <option value="flooding">flooding</option>
           <option value="protest">protest or civil unrest</option>
-          <option value="road">road impassable</option>
+          <option value="road">impassable roads</option>
         </select>
-        <label for="period-field">from the last</label>
+        <label for="period-field">halving in temperature every</label>
         <select
           id="period-field"
           name="period-field"
           required
           onchange="loadHotSpotData()"
         >
-          <option value="1">1 hour</option>
+          <option value="1">1 hour (hides older reports)</option>
           <option value="4">4 hours</option>
           <option value="24">24 hours</option>
-          <option selected value="720">30 days</option>
+          <option selected value="720">30 days (reveals older reports)</option>
         </select>
         <div id="map"></div>
         <script
@@ -149,10 +152,6 @@
 
             if (urlParams.has("obs")) {
               document.querySelector("#obs-field").value = urlParams.get("obs");
-            }
-            if (urlParams.has("period")) {
-              document.querySelector("#period-field").value =
-                urlParams.get("period");
             }
 
             if (urlParams.has("lat") && urlParams.has("lng")) {

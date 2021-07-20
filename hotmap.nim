@@ -26,13 +26,14 @@ logger.log(
 var report_times = init_table[string, int64]()
 
 type
-  SummaryReport = object
+  HotSpotReport = object
     lat: float
     lng: float
     obs: string
     notes: string
     created: string
     distance: float
+    temp : float
 
 type
   Report = object
@@ -43,7 +44,6 @@ type
     notes: string
     sender_ip: string
     created: string # TODO: use DateTime?
-    temp : float
 
 proc get_sender_ip(request: Request): string =
     try:
@@ -135,7 +135,7 @@ routes:
             """
         ))
 
-        var reports = new_seq[SummaryReport](0)
+        var reports = new_seq[HotSpotReport](0)
 
         for row in db.fast_rows(
             query,
@@ -146,7 +146,7 @@ routes:
             lat, lng,
             radius_km
         ):
-            let report = SummaryReport(
+            let report = HotSpotReport(
                 lat: parse_float(row[0]),
                 lng: parse_float(row[1]),
                 obs: row[2],
@@ -163,53 +163,32 @@ routes:
     get "/hot-spots":
         let params = request.params()
         let sender_ip = get_sender_ip(request)
+        let heat_xfer_coef = 1/parse_float(params["period"])
 
+        # TODO the next cast to float caused by something quoting
+        # the heat_xfer_coef parameter is very annoying
         const query = sql"""
-            with recent_report as (
-            select
-                *
-            from
-                report
-            where
-                obs = ?
-                and created >= current_timestamp - interval ? hour),
-            adjacent as (
-            select
-                rr1.*
-            from
-                recent_report rr1
-            left join recent_report rr2 on
-                point(rr1.lat, rr1.lng) <@> point(rr2.lat, rr2.lng) < 0.62137119 * 0.2 -- km converted to miles
-            )
-            select
-                id,
+            select 
                 lat,
                 lng,
                 obs,
                 notes,
                 created,
-                log(2, 1+count(*)) as "temp" -- temperature
-            from
-                adjacent
-            group by
-                id,
-                lat,
-                lng,
-                obs,
-                notes,
-                created;"""
+                2^(-cast(? as float) * age_hours) "temp"
+            from hotspot_report
+            where obs = ?
+            """
 
-        var reports = new_seq[Report](0)
+        var reports = new_seq[HotSpotReport](0)
 
-        for row in db.fast_rows(query, params["obs"], params["period"]):
-            let report = Report(
-                id: parse_int(row[0]),
-                lat: parse_float(row[1]),
-                lng: parse_float(row[2]),
-                obs: row[3],
-                notes: row[4],
-                created: row[5],
-                temp: parse_float(row[6])
+        for row in db.fast_rows(query, heat_xfer_coef, params["obs"]):
+            let report = HotSpotReport(
+                lat: parse_float(row[0]),
+                lng: parse_float(row[1]),
+                obs: row[2],
+                notes: row[3],
+                created: row[4],
+                temp: parse_float(row[5])
             )
             reports.add(report)
             

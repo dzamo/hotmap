@@ -9,51 +9,27 @@ create table report (
 	created timestamp not null default now()
 );
 
-with recent_report as (
+create or replace view summary_report as
 select
-	*
-from
-	report
-where
-	obs = '${obs}'
-	and created >= current_timestamp - interval '${period}' day),
-adjacent as (
-select
-	rr1.*
-from
-	recent_report rr1
-left join recent_report rr2 on
-	point(rr1.lat, rr1.lng) <@> point(rr2.lat, rr2.lng) < 0.62137119 * 0.2
-	-- km converted to miles
-)
-select
-	id,
 	lat,
 	lng,
 	obs,
 	notes,
 	created,
-	log(2, 1 + count(*)) as "temp"
-	-- temperature
-
-	from adjacent
-group by
-	id,
-	lat,
-	lng,
-	obs,
-	notes,
-	created;
+	extract(epoch from (current_timestamp - created))/3600e0 age_hours
+from
+	report;
 
 -- tests
 select count(*) from report;
 
 select * from report;
 
-select
-	*
-from
-	hot_spot;
+select 
+	*, 
+	2^(-${heat_xfer_coef} * age_hours) "temp"
+from summary_report;
+
 
 SELECT
 	lat,
