@@ -146,7 +146,6 @@ routes:
             lat, lng,
             radius_km
         ):
-            echo row[5]
             let report = SummaryReport(
                 lat: parse_float(row[0]),
                 lng: parse_float(row[1]),
