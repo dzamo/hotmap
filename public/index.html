@@ -148,11 +148,11 @@
             var urlParams = new URLSearchParams(window.location.search);
 
             if (urlParams.has("obs")) {
-              document.querySelector("#obs-field").value = urlParams["obs"];
+              document.querySelector("#obs-field").value = urlParams.get("obs");
             }
             if (urlParams.has("period")) {
               document.querySelector("#period-field").value =
-                urlParams["period"];
+                urlParams.get("period");
             }
 
             if (urlParams.has("lat") && urlParams.has("lng")) {

@@ -122,6 +122,7 @@ routes:
                 created,
                 case
                     when ? < 1e10 then 1.609344 * (point(lat,lng) <@> point(?,?))
+                    else 1e10
                 end distance
             from
                 report
@@ -145,6 +146,7 @@ routes:
             lat, lng,
             radius_km
         ):
+            echo row[5]
             let report = SummaryReport(
                 lat: parse_float(row[0]),
                 lng: parse_float(row[1]),

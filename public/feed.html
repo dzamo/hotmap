@@ -28,33 +28,35 @@
     <script>
       async function loadReportsTable() {
         var lat = "",
-          lng = "";
+          lng = "",
+          radiusKm = "";
 
         try {
           const position = await getPosition();
           lat = position.coords.latitude;
           lng = position.coords.longitude;
+          radiusKm = document.querySelector("#radius-km-field").value;
         } catch (err) {
           console.log("Location not found, fetching all reports.");
         } finally {
           const obs = document.querySelector("#obs-field").value;
           const period = document.querySelector("#period-field").value;
-          const radiusKm = document.querySelector("#radius-km-field").value;
 
           const resp = await axios.get(
             `/reports?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}&radius-km=${radiusKm}`
           );
           var tbodyHtml = "";
           resp.data.map(function (d) {
-            shortTime = d.created.substring(0, 16);
+            prettyTime = d.created.substring(0, 16);
+            prettyDist = d.distance < 1e10 ? d.distance.toFixed(1) : "? ";
             tbodyHtml += `
 	      	<tr>
-	        	<td>${shortTime}</td>
+	        	<td>${prettyTime}</td>
 	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}&obs=${
               d.obs
-            }&period=${period}">${d.distance.toFixed(
-              1
-            )}km away (${d.lat.toFixed(4)}, ${d.lng.toFixed(4)})</a></td>
+            }&period=${period}">${prettyDist}km away (${d.lat.toFixed(
+              4
+            )}, ${d.lng.toFixed(4)})</a></td>
 	        	<td>${d.notes}</td>
 	        </tr>
 	      `;
