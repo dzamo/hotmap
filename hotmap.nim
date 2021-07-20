@@ -86,27 +86,34 @@ routes:
         
     get "/reports":
         let params = request.params()
-        var and_geo_search: string
+        var lat, lng = 0.0
+        var distance = 1e10
         
         try:
-            let lat = parse_float(params["lat"])
-            let lng = parse_float(params["lng"])
-            and_geo_search = fmt"and point(lat, lng) <@> point({lat}, {lng}) < 0.62137119 * 5"
+            lat = parse_float(params["lat"])
+            lng = parse_float(params["lng"])
+            distance = parse_float(params["distance"])
         except ValueError:
-            and_geo_search = ""
+            discard
 
         let query = sql(fmt(
             """select *
             from report
             where obs = ?
             and created >= current_timestamp - interval ? hour
-            {and_geo_search}
+            and point(lat, lng) <@> point(?, ?) < 0.62137119 * ?
             order by created desc"""
         ))
 
         var reports = new_seq[Report](0)
 
-        for row in db.fast_rows(query, params["obs"], params["period"]):
+        for row in db.fast_rows(
+            query,
+            params["obs"],
+            params["period"],
+            lat, lng,
+            distance
+        ):
             let report = Report(
                 id: parse_int(row[0]),
                 lat: parse_float(row[1]),
@@ -125,10 +132,40 @@ routes:
         let params = request.params()
 
         const query = sql"""
-            select *
-            from hot_spot
-            where obs = ?
-            and created >= current_timestamp - interval ? hour"""
+            with recent_report as (
+            select
+                *
+            from
+                report
+            where
+                obs = ?
+                and created >= current_timestamp - interval ? hour),
+            adjacent as (
+            select
+                rr1.*
+            from
+                recent_report rr1
+            left join recent_report rr2 on
+                point(rr1.lat, rr1.lng) <@> point(rr2.lat, rr2.lng) < 0.62137119 * 0.2 -- km converted to miles
+            )
+            select
+                id,
+                lat,
+                lng,
+                obs,
+                notes,
+                created,
+                log(2, 1+count(*)) as "temp" -- temperature
+            from
+                adjacent
+            group by
+                id,
+                lat,
+                lng,
+                obs,
+                notes,
+                created;"""
+
         var reports = new_seq[Report](0)
 
         for row in db.fast_rows(query, params["obs"], params["period"]):
