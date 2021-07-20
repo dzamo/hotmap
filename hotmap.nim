@@ -26,6 +26,15 @@ logger.log(
 var report_times = init_table[string, int64]()
 
 type
+  SummaryReport = object
+    lat: float
+    lng: float
+    obs: string
+    notes: string
+    created: string
+    distance: float
+
+type
   Report = object
     id: int
     lat: float
@@ -36,19 +45,12 @@ type
     created: string # TODO: use DateTime?
     temp : float
 
-proc save_report(report: Report) =
-    const insert_sql = sql"""
-        insert into report(lat, lng, obs, notes, sender_ip)
-        values(?,?,?,?,?)
-        """
+proc get_sender_ip(request: Request): string =
+    try:
+        return request.headers["X-Real-IP"]
+    except KeyError:
+        return request.ip
 
-    db.exec(insert_sql,
-        report.lat,
-        report.lng,
-        report.obs,
-        report.notes,
-        report.sender_ip
-    )
 
 settings:
     bind_addr = dict.get_section_value("Web_service", "bind_addr")
@@ -60,7 +62,8 @@ routes:
 
     post "/reports":
         let now = getTime().toUnix()
-        let last_report = report_times.getOrDefault(request.ip)
+        let sender_ip = get_sender_ip(request)
+        let last_report = report_times.getOrDefault(sender_ip)
         
         if now - last_report < 2*60*60:
             resp(
@@ -69,7 +72,7 @@ routes:
                 try again later."""
             )
 
-        report_times[request.ip] = now
+        report_times[sender_ip] = now
 
         let params = request.params()
 
@@ -78,58 +81,87 @@ routes:
             lng: parse_float(params["lng-field"]),
             obs: params["obs-field"],
             notes: params["notes-field"],
-            sender_ip: request.ip
+            sender_ip: sender_ip
         )
-        save_report(report)
-        logger.log(lvl_info, "Inserted a new report.")
+        const insert_sql = sql"""
+            insert into report(lat, lng, obs, notes, sender_ip)
+            values(?,?,?,?,?)
+            """
+
+        db.exec(insert_sql,
+            report.lat,
+            report.lng,
+            report.obs,
+            report.notes,
+            report.sender_ip
+        )
+
+        logger.log(lvl_info, fmt"Inserted a new report from {sender_ip}.")
         redirect("/done.html")
         
     get "/reports":
         let params = request.params()
+        let sender_ip = get_sender_ip(request)
         var lat, lng = 0.0
-        var distance = 1e10
+        var radius_km = 1e10
         
         try:
             lat = parse_float(params["lat"])
             lng = parse_float(params["lng"])
-            distance = parse_float(params["distance"])
+            radius_km = parse_float(params["radius-km"])
         except ValueError:
             discard
 
         let query = sql(fmt(
-            """select *
-            from report
-            where obs = ?
-            and created >= current_timestamp - interval ? hour
-            and point(lat, lng) <@> point(?, ?) < 0.62137119 * ?
-            order by created desc"""
+            """
+            select
+                lat,
+                lng,
+                obs,
+                notes,
+                created,
+                case
+                    when ? < 1e10 then 1.609344 * (point(lat,lng) <@> point(?,?))
+                end distance
+            from
+                report
+            where
+                obs = ?
+                and created >= current_timestamp - interval ? hour
+                and point(lat,lng) <@> point(?,?) < 0.62137119 * ?
+            order by
+                created desc
+            """
         ))
 
-        var reports = new_seq[Report](0)
+        var reports = new_seq[SummaryReport](0)
 
         for row in db.fast_rows(
             query,
+            radius_km,
+            lat, lng,
             params["obs"],
             params["period"],
             lat, lng,
-            distance
+            radius_km
         ):
-            let report = Report(
-                id: parse_int(row[0]),
-                lat: parse_float(row[1]),
-                lng: parse_float(row[2]),
-                obs: row[3],
-                notes: row[4],
-                sender_ip: row[5],
-                created: row[6]
+            let report = SummaryReport(
+                lat: parse_float(row[0]),
+                lng: parse_float(row[1]),
+                obs: row[2],
+                notes: row[3],
+                created: row[4],
+                distance: parse_float(row[5])
+                
             )
             reports.add(report)
             
-        logger.log(lvl_info, fmt"Returning {len(reports)} reports.")
+        logger.log(lvl_info, fmt"Returning {len(reports)} reports to {sender_ip}.")
         resp  %*(reports)
 
     get "/hot-spots":
         let params = request.params()
+        let sender_ip = get_sender_ip(request)
 
         const query = sql"""
             with recent_report as (
@@ -180,6 +212,6 @@ routes:
             )
             reports.add(report)
             
-        logger.log(lvl_info, fmt"Returning {len(reports)} reports.")
+        logger.log(lvl_info, fmt"Returning {len(reports)} reports to {sender_ip}.")
         resp  %*(reports)
 

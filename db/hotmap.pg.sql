@@ -44,6 +44,7 @@ group by
 	obs,
 	notes,
 	created;
+
 -- tests
 select count(*) from report;
 
@@ -53,3 +54,21 @@ select
 	*
 from
 	hot_spot;
+
+SELECT
+	lat,
+	lng,
+	obs,
+	notes,
+	created,
+	CASE
+		WHEN ${radius_km} < 1e10 THEN 1.609344 * (point(lat,lng) <@> point(${lat},${lng}))
+	END distance
+FROM
+	report
+WHERE
+	obs = ?
+	AND created >= current_timestamp - INTERVAL '30' day
+	AND point(lat,lng) <@> point(${lat},${lng}) < 0.62137119 * ${radius_km}
+ORDER BY
+	created DESC

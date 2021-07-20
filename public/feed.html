@@ -39,20 +39,22 @@
         } finally {
           const obs = document.querySelector("#obs-field").value;
           const period = document.querySelector("#period-field").value;
-          const distance = document.querySelector("#distance-field").value;
+          const radiusKm = document.querySelector("#radius-km-field").value;
 
           const resp = await axios.get(
-            `/reports?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}&distance=${distance}`
+            `/reports?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}&radius-km=${radiusKm}`
           );
           var tbodyHtml = "";
           resp.data.map(function (d) {
-            shortTime = d.created.substring(0, d.created.indexOf("."));
+            shortTime = d.created.substring(0, 16);
             tbodyHtml += `
 	      	<tr>
 	        	<td>${shortTime}</td>
-	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}">${d.lat.toFixed(4)}, ${
-              d.lng.toFixed(4)
-            }</a></td>
+	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}&obs=${
+              d.obs
+            }&period=${period}">${d.distance.toFixed(
+              1
+            )}km away (${d.lat.toFixed(4)}, ${d.lng.toFixed(4)})</a></td>
 	        	<td>${d.notes}</td>
 	        </tr>
 	      `;
@@ -92,16 +94,17 @@
           required
           onchange="loadReportsTable()"
         >
-              <option value="covid_vac">
-                COVID-19 vaccination for walk-ins
-              </option>
-          <option value="supplies">supplies like food, water or blankets</option>
-              <option selected value="crime">suspicious or criminal activity</option>
-              <option value="fire">uncontrolled fire</option>
-              <option value="flooding">flooding</option>
-              <option value="electrical">infrastructure problem: electrical</option>
-              <option value="road">infrastructure problem: road</option>
-              <option value="water">infrastructure problem: water and sanitation</option>
+          <option value="covid_vac">COVID-19 vaccination for walk-ins</option>
+          <option value="supplies">
+            supplies like food, water or blankets
+          </option>
+          <option selected value="crime">
+            suspicious or criminal activity
+          </option>
+          <option value="fire">uncontrolled fire</option>
+          <option value="flooding">flooding</option>
+          <option value="protest">protest or civil unrest</option>
+          <option value="road">road impassable</option>
         </select>
         <label for="period-field">from the last</label>
         <select
@@ -115,12 +118,17 @@
           <option value="24">24 hours</option>
           <option selected value="720">30 days</option>
         </select>
-        <label for="distance-field">within a distance of</label>
-        <select id="distance-field" name="distance-field" required onchange="loadReportsTable()"
-        <option value="1">1 km</option>
-        <option selected value="5">5 km</option>
-        <option value="20">20 km</option>
-        <option value="100">100 km</option>
+        <label for="radius-km-field">within a distance of</label>
+        <select
+          id="radius-km-field"
+          name="radius-km-field"
+          required
+          onchange="loadReportsTable()"
+        >
+          <option value="1">1 km</option>
+          <option selected value="5">5 km</option>
+          <option value="20">20 km</option>
+          <option value="100">100 km</option>
         </select>
         <table id="reportTable">
           <thead>

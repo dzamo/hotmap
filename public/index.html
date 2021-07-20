@@ -112,16 +112,17 @@
           required
           onchange="loadHotSpotData()"
         >
-              <option value="covid_vac">
-                COVID-19 vaccination for walk-ins
-              </option>
-          <option value="supplies">supplies like food, water or blankets</option>
-              <option selected value="crime">suspicious or criminal activity</option>
-              <option value="fire">uncontrolled fire</option>
-              <option value="flooding">flooding</option>
-              <option value="electrical">infrastructure problem: electrical</option>
-              <option value="road">infrastructure problem: road</option>
-              <option value="water">infrastructure problem: water and sanitation</option>
+          <option value="covid_vac">COVID-19 vaccination for walk-ins</option>
+          <option value="supplies">
+            supplies like food, water or blankets
+          </option>
+          <option selected value="crime">
+            suspicious or criminal activity
+          </option>
+          <option value="fire">uncontrolled fire</option>
+          <option value="flooding">flooding</option>
+          <option value="protest">protest or civil unrest</option>
+          <option value="road">road impassable</option>
         </select>
         <label for="period-field">from the last</label>
         <select
@@ -145,6 +146,15 @@
         <script>
           window.onload = async function () {
             var urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.has("obs")) {
+              document.querySelector("#obs-field").value = urlParams["obs"];
+            }
+            if (urlParams.has("period")) {
+              document.querySelector("#period-field").value =
+                urlParams["period"];
+            }
+
             if (urlParams.has("lat") && urlParams.has("lng")) {
               lat = urlParams.get("lat");
               lng = urlParams.get("lng");
