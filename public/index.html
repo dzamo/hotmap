@@ -99,13 +99,12 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Essential South African hot spots</h4>
+        <h4>🇿🇦 Public South African hot spots</h4>
         <p>
           The map temperature reflects the number of recent reports in an area.
-          <b>Your reports power this map</b>, use the menu above to send a
+          <b>Your reports power these heat maps</b>, use the menu above to send a
           report whenever you are near a site of one of the sorts below. Send
-          repeat reports up to every two hours per device to keep the map
-          accurate.
+          repeat reports, at most one every two hours, to keep the map updated.
         </p>
         <label for="obs-field">Show reports of</label>
         <select
@@ -114,11 +113,11 @@
           required
           onchange="loadHotSpotData()"
         >
-          <option value="covid_vac">COVID-19 vaccination for walk-ins</option>
+          <option selected value="covid_vac">COVID-19 vaccination for walk-ins</option>
           <option value="supplies">
             supplies like food, water or blankets
           </option>
-          <option selected value="crime">
+          <option value="crime">
             suspicious or criminal activity
           </option>
           <option value="dumping">illegal dumping or litter</option>

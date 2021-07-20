@@ -100,3 +100,23 @@ select
 from public.report 
 order by id
 limit 82;
+
+-- Walk-in COVID-19 vaccinations
+-- https://bird.trom.tf/ryanlenorabrown
+-- https://bird.trom.tf/GautengHealth
+
+INSERT INTO public.report (lat, lng, notes, obs, sender_ip, created) values
+(-26.02055,28.00570, 'Dis-Chem Fourways Mall', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.01741,28.12826, 'Dis-Chem Warehouse Midrand', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.18106,28.01717, 'Milpark Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.19354,28.04540, 'Hillbrow Community Health Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.17497,28.04555, 'Carlotte Maxeke Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.13069,27.97478, 'Clicks Cresta', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.10350,28.05990, 'Momentum at The Marc', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.13615,27.95216, 'Berario Clinic', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.01098,28.01088, 'Witkoppen Health and Welfare', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.11252,28.05317, 'Discovery Sandton', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.34692,27.39403, 'Careletonville Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.17226,27.80576, 'Leratong Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.09948,27.78392, 'Dr Yusuf Dadoo Hospital', 'covid_vac', '127.0.0.1', '2021-07-17');
+

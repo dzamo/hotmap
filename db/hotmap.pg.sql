@@ -9,7 +9,7 @@ create table report (
 	created timestamp not null default now()
 );
 
-create or replace view summary_report as
+create or replace view hotspot_report as
 select
 	lat,
 	lng,
