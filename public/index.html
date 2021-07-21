@@ -106,9 +106,9 @@
       <section id="docs" class="container">
         <h4>🇿🇦 Heat maps by the people</h4>
         <p>
-          Heat maps built from reports sent from anyone's mobile device. The map
-          temperature reflects the number of recent reports in an area. Click on
-          the map to see a listing of reports near that point.
+          Heat maps built with data from our mobile devices. The map temperature
+          reflects the number of recent reports in an area. Click on the map to
+          see a listing of reports near that point.
           <b>Your reports power this app</b>, use the menu above to send a
           report whenever you make one of the observations below.
         </p>
@@ -145,7 +145,7 @@
         <script src="https://cdn.jsdelivr.net/npm/leaflet-heatmap@1.0.0/leaflet-heatmap.min.js"></script>
         <script>
           window.onload = async function () {
-	        const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = new URLSearchParams(window.location.search);
 
             for (const [key, value] of urlParams) {
               field = document.querySelector(`#${key}`);

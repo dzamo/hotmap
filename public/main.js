@@ -25,4 +25,3 @@ function getPosition(options) {
     navigator.geolocation.getCurrentPosition(resolve, reject, options)
   );
 }
-
