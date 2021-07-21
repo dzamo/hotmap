@@ -58,16 +58,21 @@
         };
         heatmapLayer = new HeatmapOverlay(cfg);
 
-        const propertyHeatMap = new L.Map("map", {
+        const leafletMap = new L.Map("map", {
           center: new L.LatLng(lat, lng),
           zoom: zoom,
           layers: [baseLayer, heatmapLayer],
         });
+
+        const obs = document.querySelector("#obs").value;
+        leafletMap.on("click", function (e) {
+          window.location.href = `/listing.html?lat=${e.latlng.lat}&lng=${e.latlng.lng}&obs=${obs}&radius-km=0.2`;
+        });
       }
 
       async function loadHotSpotData() {
-        const obs = document.querySelector("#obs-field").value;
-        const period = document.querySelector("#period-field").value;
+        const obs = document.querySelector("#obs").value;
+        const period = document.querySelector("#period").value;
 
         const resp = await axios.get(
           `/hot-spots?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}`
@@ -90,7 +95,7 @@
               <a class="navigation-link" href="/">Live map</a>
             </li>
             <li class="navigation-item">
-              <a class="navigation-link" href="/feed.html">Nearby reports</a>
+              <a class="navigation-link" href="/listing.html">Nearby reports</a>
             </li>
             <li class="navigation-item">
               <a class="navigation-link" href="/new.html">New report</a>
@@ -99,40 +104,33 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Public South African hot spots</h4>
+        <h4>🇿🇦 Heat maps by the people</h4>
         <p>
-          The map temperature reflects the number of recent reports in an area.
-          <b>Your reports power these heat maps</b>, use the menu above to send a
-          report whenever you are near a site of one of the sorts below. Send
-          repeat reports, at most one every two hours, to keep the map updated.
+          Heat maps built from reports sent from anyone's mobile device. The map
+          temperature reflects the number of recent reports in an area. Click on
+          the map to see a listing of reports near that point.
+          <b>Your reports power this app</b>, use the menu above to send a
+          report whenever you make one of the observations below.
         </p>
-        <label for="obs-field">Show reports of</label>
-        <select
-          id="obs-field"
-          name="obs-field"
-          required
-          onchange="loadHotSpotData()"
-        >
-          <option selected value="covid_vac">COVID-19 vaccination for walk-ins</option>
+        <label for="obs">Show hot spots of</label>
+        <select id="obs" name="obs" required onchange="loadHotSpotData()">
+          <option selected value="covid_vac">
+            COVID-19 vaccination for walk-ins
+          </option>
           <option value="supplies">
             supplies like food, water or blankets
           </option>
-          <option value="crime">
-            suspicious or criminal activity
+          <option value="crime">suspicious or criminal activity</option>
+          <option value="dumping">
+            illegal dumping, litter or eco hazards
           </option>
-          <option value="dumping">illegal dumping or litter</option>
           <option value="fire">uncontrolled fire</option>
           <option value="flooding">flooding</option>
           <option value="protest">protest or civil unrest</option>
           <option value="road">impassable roads</option>
         </select>
-        <label for="period-field">halving in temperature every</label>
-        <select
-          id="period-field"
-          name="period-field"
-          required
-          onchange="loadHotSpotData()"
-        >
+        <label for="period">halving in temperature every</label>
+        <select id="period" name="period" required onchange="loadHotSpotData()">
           <option value="1">1 hour (hides older reports)</option>
           <option value="4">4 hours</option>
           <option value="24">24 hours</option>
@@ -147,29 +145,28 @@
         <script src="https://cdn.jsdelivr.net/npm/leaflet-heatmap@1.0.0/leaflet-heatmap.min.js"></script>
         <script>
           window.onload = async function () {
-            var urlParams = new URLSearchParams(window.location.search);
+	        const urlParams = new URLSearchParams(window.location.search);
 
-            if (urlParams.has("obs")) {
-              document.querySelector("#obs-field").value = urlParams.get("obs");
+            for (const [key, value] of urlParams) {
+              field = document.querySelector(`#${key}`);
+              if (field) field.value = value;
             }
 
-            if (urlParams.has("lat") && urlParams.has("lng")) {
-              lat = urlParams.get("lat");
-              lng = urlParams.get("lng");
-              zoom = 16;
-              createMap();
-              loadHotSpotData();
-            } else {
-              try {
+            try {
+              if (!urlParams.has("lat")) {
                 const position = await getPosition();
                 lat = position.coords.latitude;
                 lng = position.coords.longitude;
-              } catch (err) {
-                console.log("Location not found, using default map centre.");
-              } finally {
-                createMap();
-                loadHotSpotData();
+              } else {
+                lat = urlParams.get("lat");
+                lng = urlParams.get("lng");
+                zoom = 16;
               }
+            } catch (err) {
+              console.log("Location not found, using default map centre.");
+            } finally {
+              createMap();
+              loadHotSpotData();
             }
           };
         </script>

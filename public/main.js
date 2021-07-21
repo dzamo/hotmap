@@ -3,7 +3,7 @@ OBS = {
   covid_vac: "COVID-19 vaccination for walk-ins",
   supplies: "Charity or emergency relief supplies",
   crime: "Suspicious or criminal activity",
-  dumping: "Illegal dumping or litter",
+  dumping: "Illegal dumping, litter or eco hazards",
   fire: "Uncontrolled fire",
   flooding: "Flooding",
   protest: "Protest or civil unrest",
@@ -25,3 +25,4 @@ function getPosition(options) {
     navigator.geolocation.getCurrentPosition(resolve, reject, options)
   );
 }
+

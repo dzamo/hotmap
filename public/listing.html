@@ -26,24 +26,38 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="main.js"></script>
     <script>
-      async function loadReportsTable() {
-        var lat = "",
-          lng = "",
-          radiusKm = "";
+      async function loadReportsTable(event_site) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!event_site) {
+          // set fields from URL if this invocation is due to a page load
+          for (const [key, value] of urlParams) {
+            field = document.querySelector(`#${key}`);
+            if (field) field.value = value;
+          }
+        }
+
+        const obs = document.querySelector("#obs").value;
+        const radiusKm = document.querySelector("#radius-km").value;
+        var lat = "";
+        var lng = "";
+        var locDesc = "(loading...)";
 
         try {
-          const position = await getPosition();
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-          radiusKm = document.querySelector("#radius-km-field").value;
+          if (!urlParams.has("lat")) {
+            const position = await getPosition();
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            locDesc = "your current location";
+          } else {
+            lat = urlParams.get("lat");
+            lng = urlParams.get("lng");
+            locDesc = "the location you selected";
+          }
         } catch (err) {
-          console.log("Location not found, fetching all reports.");
+          locDesc = "anywhere because no location was available";
         } finally {
-          const obs = document.querySelector("#obs-field").value;
-          const period = document.querySelector("#period-field").value;
-
           const resp = await axios.get(
-            `/reports?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}&radius-km=${radiusKm}`
+            `/reports?lat=${lat}&lng=${lng}&obs=${obs}&radius-km=${radiusKm}`
           );
           var tbodyHtml = "";
           resp.data.map(function (d) {
@@ -54,19 +68,22 @@
 	        	<td>${prettyTime}</td>
 	        	<td><a href="/index.html?lat=${d.lat}&lng=${d.lng}&obs=${
               d.obs
-            }&period=${period}">${prettyDist}km away (${d.lat.toFixed(
+            }">${prettyDist}km away (${d.lat.toFixed(4)}, ${d.lng.toFixed(
               4
-            )}, ${d.lng.toFixed(4)})</a></td>
+            )})</a></td>
 	        	<td>${d.notes}</td>
 	        </tr>
 	      `;
           });
           document.querySelector("#reportTable tbody").innerHTML = tbodyHtml;
+          document.querySelector("#desc").innerHTML = `
+          Reports near ${locDesc}.  Click on location links to show them on
+          the map.`;
         }
       }
     </script>
   </head>
-  <body onload="loadReportsTable()">
+  <body onload="loadReportsTable(null)">
     <main class="wrapper">
       <nav class="navigation">
         <section class="container">
@@ -75,7 +92,7 @@
               <a class="navigation-link" href="/">Live map</a>
             </li>
             <li class="navigation-item">
-              <a class="navigation-link" href="/feed.html">Nearby reports</a>
+              <a class="navigation-link" href="/listing.html">Nearby reports</a>
             </li>
             <li class="navigation-item">
               <a class="navigation-link" href="/new.html">New report</a>
@@ -84,47 +101,33 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Public South African hot spots</h4>
-        <p>Click on locations to show them on the map.</p>
-        <label for="obs-field">List all reports of</label>
-        <select
-          id="obs-field"
-          name="obs-field"
-          required
-          onchange="loadReportsTable()"
-        >
-          <option selected value="covid_vac">COVID-19 vaccination for walk-ins</option>
+        <h4>🇿🇦 Heat maps by the people</h4>
+        <p id="desc"></p>
+        <label for="obs">List all reports of</label>
+        <select id="obs" name="obs" required onchange="loadReportsTable()">
+          <option selected value="covid_vac">
+            COVID-19 vaccination for walk-ins
+          </option>
           <option value="supplies">
             supplies like food, water or blankets
           </option>
-          <option value="crime">
-            suspicious or criminal activity
+          <option value="crime">suspicious or criminal activity</option>
+          <option value="dumping">
+            illegal dumping, litter or eco hazards
           </option>
-          <option value="dumping">illegal dumping or litter</option>
           <option value="fire">uncontrolled fire</option>
           <option value="flooding">flooding</option>
           <option value="protest">protest or civil unrest</option>
           <option value="road">impassable roads</option>
         </select>
-        <label for="period-field">from the last</label>
+        <label for="radius-km">within a distance of</label>
         <select
-          id="period-field"
-          name="period-field"
+          id="radius-km"
+          name="radius-km"
           required
-          onchange="loadReportsTable()"
+          onchange="loadReportsTable(this)"
         >
-          <option value="1">1 hour</option>
-          <option value="4">4 hours</option>
-          <option value="24">24 hours</option>
-          <option selected value="720">30 days</option>
-        </select>
-        <label for="radius-km-field">within a distance of</label>
-        <select
-          id="radius-km-field"
-          name="radius-km-field"
-          required
-          onchange="loadReportsTable()"
-        >
+          <option value="0.2">200m</option>
           <option value="1">1 km</option>
           <option selected value="5">5 km</option>
           <option value="20">20 km</option>

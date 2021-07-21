@@ -9,6 +9,8 @@ create table report (
 	created timestamp not null default now()
 );
 
+create index ix_created on report(obs, created);
+
 create or replace view hotspot_report as
 select
 	lat,
@@ -23,7 +25,15 @@ from
 -- tests
 select count(*) from report;
 
-select * from report;
+explain analyse
+select
+	*
+from
+	report
+where
+	obs = 'covid_vac'
+order by
+	created desc;
 
 select 
 	*, 

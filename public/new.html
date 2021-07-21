@@ -42,8 +42,8 @@
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
 
-          const latField = document.querySelector("#lat-field");
-          const lngField = document.querySelector("#lng-field");
+          const latField = document.querySelector("#lat");
+          const lngField = document.querySelector("#lng");
           latField.value = lat;
           lngField.value = lng;
 
@@ -58,7 +58,7 @@
       }
 
       function obsChanged(obsField) {
-        const notesField = document.querySelector("#notes-field");
+        const notesField = document.querySelector("#notes");
         notesField.placeholder = NOTES_EGS[obsField.value];
         notesField.disabled = obsField.value == "testing";
       }
@@ -73,7 +73,7 @@
               <a class="navigation-link" href="/">Live map</a>
             </li>
             <li class="navigation-item">
-              <a class="navigation-link" href="/feed.html">Nearby reports</a>
+              <a class="navigation-link" href="/listing.html">Nearby reports</a>
             </li>
             <li class="navigation-item">
               <a class="navigation-link" href="/new.html">New report</a>
@@ -82,7 +82,7 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Public South African hot spots</h4>
+        <h4>🇿🇦 Heat maps by the people</h4>
         <p>
           <b>N.B.</b> You must have location enabled on your device and
           physically be near the site to send a valid report. Reports filed here
@@ -94,13 +94,8 @@
       <section class="container">
         <form action="/reports" method="post">
           <fieldset>
-            <label for="obs-field">Near my current location I observed</label>
-            <select
-              id="obs-field"
-              name="obs-field"
-              required
-              onchange="obsChanged(this)"
-            >
+            <label for="obs">Near my current location I observed</label>
+            <select id="obs" name="obs" required onchange="obsChanged(this)">
               <option selected value="testing">
                 nothing, I'm just testing
               </option>
@@ -111,17 +106,19 @@
                 supplies like food, water or blankets
               </option>
               <option value="crime">suspicious or criminal activity</option>
-              <option value="dumping">illegal dumping or litter</option>
+              <option value="dumping">
+                illegal dumping, litter or eco hazards
+              </option>
               <option value="fire">uncontrolled fire</option>
               <option value="flooding">flooding</option>
               <option value="protest">protest or civil unrest</option>
               <option value="road">impassable roads</option>
             </select>
 
-            <label for="notes-field">Extra notes (optional)</label>
+            <label for="notes">Extra notes (optional)</label>
             <textarea
-              id="notes-field"
-              name="notes-field"
+              id="notes"
+              name="notes"
               disabled
               placeholder="This field will be enabled when you select an observation."
             ></textarea>
@@ -129,8 +126,8 @@
             <label for="map-link">Location status: </label>
             <a id="map-link" target="_blank">not yet found.</a>
 
-            <input type="hidden" id="lat-field" name="lat-field" />
-            <input type="hidden" id="lng-field" name="lng-field" />
+            <input type="hidden" id="lat" name="lat" />
+            <input type="hidden" id="lng" name="lng" />
           </fieldset>
           <input
             id="send-button"

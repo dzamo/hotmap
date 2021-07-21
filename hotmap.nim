@@ -77,10 +77,10 @@ routes:
         let params = request.params()
 
         let report = Report(
-            lat: parse_float(params["lat-field"]),
-            lng: parse_float(params["lng-field"]),
-            obs: params["obs-field"],
-            notes: params["notes-field"],
+            lat: parse_float(params["lat"]),
+            lng: parse_float(params["lng"]),
+            obs: params["obs"],
+            notes: params["notes"],
             sender_ip: sender_ip
         )
         const insert_sql = sql"""
@@ -128,10 +128,10 @@ routes:
                 report
             where
                 obs = ?
-                and created >= current_timestamp - interval ? hour
                 and point(lat,lng) <@> point(?,?) < 0.62137119 * ?
             order by
                 created desc
+            limit 100
             """
         ))
 
@@ -142,7 +142,6 @@ routes:
             radius_km,
             lat, lng,
             params["obs"],
-            params["period"],
             lat, lng,
             radius_km
         ):

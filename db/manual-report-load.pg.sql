@@ -118,5 +118,19 @@ INSERT INTO public.report (lat, lng, notes, obs, sender_ip, created) values
 (-26.11252,28.05317, 'Discovery Sandton', 'covid_vac', '127.0.0.1', '2021-07-17'),
 (-26.34692,27.39403, 'Careletonville Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
 (-26.17226,27.80576, 'Leratong Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
-(-26.09948,27.78392, 'Dr Yusuf Dadoo Hospital', 'covid_vac', '127.0.0.1', '2021-07-17');
-
+(-26.09948,27.78392, 'Dr Yusuf Dadoo Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-25.71960,28.36894, 'Mamelodi Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-25.7622,28.1623, 'Weskoppies Psychiatric Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-25.73200,28.19917, 'University of Pretoria', 'covid_vac', '127.0.0.1', '2021-07-17')
+(-29.93715,30.95664, 'Clairwood Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-29.86199,31.04115, 'Addington Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-29.81465,30.86283, 'Pinetown Civic Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-29.85113,31.01071, 'St Aiden''s Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-33.93772,18.58501, 'Adriaanse Clinic', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-33.90014,18.48533, 'Brooklyn Chest Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-34.06222,18.46051, 'DP Marais Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-33.99802,18.71922, 'Eerste River Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-34.13117,18.41465, 'False Bay Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-32.99599,27.89166, 'Frere Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-32.99879,27.90335, 'Life St Dominic''s Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-32.93209,27.74083, 'Nkqubela Hospital', 'covid_vac', '127.0.0.1', '2021-07-17');
