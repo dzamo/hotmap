@@ -64,8 +64,8 @@
           layers: [baseLayer, heatmapLayer],
         });
 
-        const obs = document.querySelector("#obs").value;
         leafletMap.on("click", function (e) {
+	      const obs = document.querySelector("#obs").value;
           window.location.href = `/listing.html?lat=${e.latlng.lat}&lng=${e.latlng.lng}&obs=${obs}&radius-km=0.2`;
         });
       }
