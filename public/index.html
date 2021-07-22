@@ -40,7 +40,8 @@
       var heatmapLayer,
         lat = -26.1069,
         lng = 28.104,
-        zoom = 10;
+        zoom = 10,
+        hotspots = [];
 
       function createMap() {
         const baseLayer = L.tileLayer(
@@ -65,21 +66,29 @@
         });
 
         leafletMap.on("click", function (e) {
-	      const obs = document.querySelector("#obs").value;
-          window.location.href = `/listing.html?lat=${e.latlng.lat}&lng=${e.latlng.lng}&obs=${obs}&radius-km=0.2`;
+          const obs = document.querySelector("#obs").value;
+          window.location.href = `/listing.html?lat=${e.latlng.lat}&lng=${e.latlng.lng}&obs=${obs}&radius-km=1`;
         });
       }
 
-      async function loadHotSpotData() {
+      async function loadHotSpots() {
         const obs = document.querySelector("#obs").value;
         const period = document.querySelector("#period").value;
 
-        const resp = await axios.get(
-          `/hot-spots?lat=${lat}&lng=${lng}&obs=${obs}&period=${period}`
-        );
+        const resp = await axios.get(`/hot-spots?obs=${obs}`);
+
+        hotspots = resp.data;
+        plotHotSpots();
+      }
+
+      function plotHotSpots() {
+        const period = parseFloat(document.querySelector("#period").value);
+
+        for (hotspot of hotspots)
+          hotspot.temp = 2 ** ((-1 / period) * hotspot.age_hours);
 
         heatmapLayer.setData({
-          data: resp.data,
+          data: hotspots,
           min: 0,
           max: 1,
         });
@@ -106,14 +115,14 @@
       <section id="docs" class="container">
         <h4>🇿🇦 Heat maps by the people</h4>
         <p>
-          Heat maps built with data from our mobile devices. The map temperature
-          reflects the number of recent reports in an area. Click on the map to
-          see a listing of reports near that point.
+          Heat maps built from anonymous reports sent from our mobile devices.
+          The map temperature reflects the number of recent reports in an area.
+          Click on the map to see a listing of reports near that point.
           <b>Your reports power this app</b>, use the menu above to send a
           report whenever you make one of the observations below.
         </p>
         <label for="obs">Show hot spots of</label>
-        <select id="obs" name="obs" required onchange="loadHotSpotData()">
+        <select id="obs" name="obs" required onchange="loadHotSpots()">
           <option selected value="covid_vac">
             COVID-19 vaccination for walk-ins
           </option>
@@ -127,10 +136,10 @@
           <option value="fire">uncontrolled fire</option>
           <option value="flooding">flooding</option>
           <option value="protest">protest or civil unrest</option>
-          <option value="road">impassable roads</option>
+          <option value="road">unsafe roads or driving</option>
         </select>
         <label for="period">halving in temperature every</label>
-        <select id="period" name="period" required onchange="loadHotSpotData()">
+        <select id="period" name="period" required onchange="plotHotSpots()">
           <option value="1">1 hour (hides older reports)</option>
           <option value="4">4 hours</option>
           <option value="24">24 hours</option>
@@ -166,7 +175,8 @@
               console.log("Location not found, using default map centre.");
             } finally {
               createMap();
-              loadHotSpotData();
+              await loadHotSpots();
+              plotHotSpots();
             }
           };
         </script>

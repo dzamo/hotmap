@@ -22,9 +22,6 @@ logger.log(
     fmt"""Connected to pg database {dict.get_section_value("Database", "db")}."""
 )
 
-# TODO: this table is wasteful and can grow without bound
-var report_times = init_table[string, int64]()
-
 type
   HotSpotReport = object
     lat: float
@@ -33,7 +30,7 @@ type
     notes: string
     created: string
     distance: float
-    temp : float
+    age_hours: float
 
 type
   Report = object
@@ -61,18 +58,23 @@ routes:
         redirect "/index.html"
 
     post "/reports":
-        let now = getTime().toUnix()
+        const user_send_rate_sql = sql"""
+            select count(*) reports_in_24h
+            from report
+            where sender_ip = ?
+              and created >= current_timestamp - interval '24' hour
+            """
+
         let sender_ip = get_sender_ip(request)
-        let last_report = report_times.getOrDefault(sender_ip)
+        let user_send_rate = parse_int(db.get_value(user_send_rate_sql, sender_ip))
         
-        if now - last_report < 2*60*60:
+        if user_send_rate >= 5:
             resp(
                 Http429,
-                """"You cannot send another report from this device yet, please
+                """You cannot send another report from this device yet, please
                 try again later."""
             )
-
-        report_times[sender_ip] = now
+            logger.log(lvl_info, fmt"Rate limited a new report from {sender_ip}.")
 
         let params = request.params()
 
@@ -80,7 +82,7 @@ routes:
             lat: parse_float(params["lat"]),
             lng: parse_float(params["lng"]),
             obs: params["obs"],
-            notes: params["notes"],
+            notes: params.get_or_default("notes"),
             sender_ip: sender_ip
         )
         const insert_sql = sql"""
@@ -162,32 +164,30 @@ routes:
     get "/hot-spots":
         let params = request.params()
         let sender_ip = get_sender_ip(request)
-        let heat_xfer_coef = 1/parse_float(params["period"])
 
-        # TODO the next cast to float caused by something quoting
-        # the heat_xfer_coef parameter is very annoying
         const query = sql"""
-            select 
-                lat,
-                lng,
-                obs,
-                notes,
-                created,
-                2^(-cast(? as float) * age_hours) "temp"
-            from hotspot_report
-            where obs = ?
+			select lat,
+			      lng,
+			      obs,
+			      notes,
+			      created,
+			      extract(epoch
+			              from (current_timestamp - created))/3600e0 age_hours
+			from report
+			where obs = ?
+			 and created >= current_date - interval '90' day
             """
 
         var reports = new_seq[HotSpotReport](0)
 
-        for row in db.fast_rows(query, heat_xfer_coef, params["obs"]):
+        for row in db.fast_rows(query, params["obs"]):
             let report = HotSpotReport(
                 lat: parse_float(row[0]),
                 lng: parse_float(row[1]),
                 obs: row[2],
                 notes: row[3],
                 created: row[4],
-                temp: parse_float(row[5])
+                age_hours: parse_float(row[5])
             )
             reports.add(report)
             

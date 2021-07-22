@@ -104,7 +104,7 @@
         <h4>🇿🇦 Heat maps by the people</h4>
         <p id="desc"></p>
         <label for="obs">List all reports of</label>
-        <select id="obs" name="obs" required onchange="loadReportsTable()">
+        <select id="obs" name="obs" required onchange="loadReportsTable(this)">
           <option selected value="covid_vac">
             COVID-19 vaccination for walk-ins
           </option>
@@ -118,7 +118,7 @@
           <option value="fire">uncontrolled fire</option>
           <option value="flooding">flooding</option>
           <option value="protest">protest or civil unrest</option>
-          <option value="road">impassable roads</option>
+          <option value="road">unsafe roads or driving</option>
         </select>
         <label for="radius-km">within a distance of</label>
         <select

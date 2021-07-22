@@ -9,18 +9,9 @@ create table report (
 	created timestamp not null default now()
 );
 
-create index ix_created on report(obs, created);
+create index ix_obs_created on report(obs, created);
 
-create or replace view hotspot_report as
-select
-	lat,
-	lng,
-	obs,
-	notes,
-	created,
-	extract(epoch from (current_timestamp - created))/3600e0 age_hours
-from
-	report;
+create index ix_sender_created on report(sender_ip, created);
 
 -- tests
 select count(*) from report;
