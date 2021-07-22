@@ -21,14 +21,14 @@ select count(*) from report;
 
 --explain analyse
 select
-	*,
-	digest(sender_ip, 'sha1')
+	*
 from
 	report
 --where
 --	obs = 'covid_vac'
 order by
 	id desc;
+
 
 explain analyse
 select

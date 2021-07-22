@@ -4,7 +4,6 @@ import jester
 import logging
 import parsecfg
 import strutils
-import times
 import tables
 import strformat
 import std/sha1

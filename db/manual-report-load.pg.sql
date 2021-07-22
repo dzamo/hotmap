@@ -136,7 +136,9 @@ INSERT INTO public.report (lat, lng, notes, obs, sender_ip, created) values
 (-32.93209,27.74083, 'Nkqubela Hospital', 'covid_vac', '127.0.0.1', '2021-07-17'),
 (-26.31468,28.05790, 'Dis-Chem Mall of the South', 'covid_vac', '127.0.0.1', '2021-07-17'),
 (-25.78308,28.27516, 'Dis-Chem Menlyn Park Shopping Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
-(-26.11594,28.09045, 'Alexandra Community Health Centre', 'covid_vac', '127.0.0.1', '2021-07-17');
-
+(-26.11594,28.09045, 'Alexandra Community Health Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.21348,28.30100, 'Mary Moodley Clinic', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.00917,28.21951, 'Themibsa Healthcare Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
+(-26.13392,28.26934, 'Christian Family Church', 'covid_vac', '127.0.0.1', '2021-07-17');
 
 

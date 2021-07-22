@@ -113,15 +113,16 @@
         </section>
       </nav>
       <section id="docs" class="container">
-        <h4>🇿🇦 Heat maps by the people</h4>
+        <h4>🇿🇦 Heat maps for the people</h4>
         <p>
           Heat maps built from anonymous reports sent from our mobile devices.
           The map temperature reflects the number of recent reports in an area.
           Click on the map to see a listing of reports near that point.
           <b>Your reports power this app</b>, use the menu above to send a
-          report whenever you make one of the observations below.
+          report from your mobile device whenever you make one of the
+          observations below.
         </p>
-        <label for="obs">Show hot spots of</label>
+        <label for="obs">Show reports of</label>
         <select id="obs" name="obs" required onchange="loadHotSpots()">
           <option selected value="covid_vac">
             COVID-19 vaccination for walk-ins
@@ -138,7 +139,7 @@
           <option value="protest">protest or civil unrest</option>
           <option value="road">unsafe roads or driving</option>
         </select>
-        <label for="period">halving in "temperature" every</label>
+        <label for="period">halving in temperature every</label>
         <select id="period" name="period" required onchange="plotHotSpots()">
           <option value="1">1 hour (hides older reports)</option>
           <option value="4">4 hours</option>
