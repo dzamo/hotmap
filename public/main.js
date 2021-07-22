@@ -12,12 +12,14 @@ OBS = {
 
 NOTES_EGS = {
   testing: "This field will be enabled when you select an observation.",
-  covid_vac: "E.g. 10 surplus doses, queue length 30 minutes",
-  crime: "E.g. 3 people, looting, attempted mugging",
-  fire: "E.g. fire break jumped here, buildings nearby",
-  infra: "E.g. road impassable, power lines down",
-  supplies: "E.g. food, water, blankets",
-  weather: "E.g. flooding",
+  covid_vac: "E.g. Midrand firestation, queue 200 people",
+  supplies: "E.g. Salvation Army, food and water",
+  crime: "E.g. 3 people, attempted mugging, red BMW",
+  dumping: "E.g. building rubble",
+  fire: "E.g. moving North",
+  flooding: "E.g. high clearance vehicles only",
+  protest: "E.g. roads blocked",
+  road: "E.g. severe potholes"
 };
 
 function getPosition(options) {

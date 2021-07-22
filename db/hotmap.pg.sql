@@ -16,13 +16,13 @@ create index ix_sender_created on report(sender_ip, created);
 -- tests
 select count(*) from report;
 
-explain analyse
+--explain analyse
 select
 	*
 from
 	report
-where
-	obs = 'covid_vac'
+--where
+--	obs = 'covid_vac'
 order by
 	created desc;
 
