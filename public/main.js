@@ -19,7 +19,7 @@ NOTES_EGS = {
   fire: "E.g. moving North",
   flooding: "E.g. high clearance vehicles only",
   protest: "E.g. roads blocked",
-  road: "E.g. severe potholes"
+  road: "E.g. severe potholes",
 };
 
 function getPosition(options) {

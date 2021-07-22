@@ -1,17 +1,17 @@
 # HotMap
 
-A simple web application targeting mobile devices which produces a crowdsourced
-heat map inspired by the widespread unrest in South Africa in July 2021.
-Any member of the public can send a report of a threat near their current
-location using the form and view the reports of others using the heat map
-and tabular listing.
+A simple web application targeting mobile devices which produces crowdsourced
+heat maps inspired by the widespread unrest in South Africa in July 2021.
+Any member of the public can send a report of one of preset number of
+categories near their current location using the form and view the reports
+of others using the heat map and tabular listing.
 
 Reports are stored in a PostgreSQL table by the service layer in hotmap.nim.
 Because there is no report verification, two measures are present in an
 attempt to maintain the heat map's integrity.
 
 1. A reporting device, currently identified by IP address, can only submit
-   one report very two hours.
+   5 reports every 24 hours.
 2. The heat map itself relies on a SQL view that weights reports by the number
    of neighbouring (within 200m currently) reports on the assumption that
    legitimate reports will be corroborated by other reporters.

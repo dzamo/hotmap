@@ -1,3 +1,6 @@
+create extension cube;
+create extension earthdistance;
+
 --drop table report cascade;
 create table report (
 	id serial primary key,
@@ -18,19 +21,23 @@ select count(*) from report;
 
 --explain analyse
 select
-	*
+	*,
+	digest(sender_ip, 'sha1')
 from
 	report
 --where
 --	obs = 'covid_vac'
 order by
-	created desc;
+	id desc;
 
-select 
-	*, 
-	2^(-${heat_xfer_coef} * age_hours) "temp"
-from summary_report;
-
+explain analyse
+select
+	count(*)
+from
+	report
+where
+	sender_ip = '${sender_ip}'
+	and created >= current_timestamp - interval '24' hour;
 
 SELECT
 	lat,

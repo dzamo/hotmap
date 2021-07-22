@@ -7,9 +7,12 @@ import strutils
 import times
 import tables
 import strformat
+import std/sha1
 
 let logger = new_console_logger(lvl_info)
 let dict = load_config("config.cfg")
+
+let sender_ip_salt = dict.get_section_value("Web_service", "sender_ip_salt")
 
 let db = open(
     dict.get_section_value("Database", "host"),
@@ -28,6 +31,7 @@ type
     lng: float
     obs: string
     notes: string
+    sender_ip_hash: string
     created: string
     distance: float
     age_hours: float
@@ -121,6 +125,7 @@ routes:
                 lng,
                 obs,
                 notes,
+                sender_ip,
                 created,
                 case
                     when ? < 1e10 then 1.609344 * (point(lat,lng) <@> point(?,?))
@@ -152,8 +157,9 @@ routes:
                 lng: parse_float(row[1]),
                 obs: row[2],
                 notes: row[3],
-                created: row[4],
-                distance: parse_float(row[5])
+                sender_ip_hash: $secure_hash(fmt"{sender_ip_salt}{row[4]}"),
+                created: row[5],
+                distance: parse_float(row[6])
                 
             )
             reports.add(report)

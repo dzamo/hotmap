@@ -72,6 +72,7 @@
               4
             )})</a></td>
 	        	<td>${d.notes}</td>
+	        	<td>${d.sender_ip_hash.substring(0, 8)}</td>
 	        </tr>
 	      `;
           });
@@ -138,6 +139,7 @@
             <th>Reported</th>
             <th>Location</th>
             <th>Notes</th>
+            <th>Sender ID</th>
           </thead>
           <tbody></tbody>
         </table>
