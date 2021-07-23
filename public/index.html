@@ -112,16 +112,18 @@
           </ul>
         </section>
       </nav>
-      <section id="docs" class="container">
-        <h4>🇿🇦 Heat maps for the people</h4>
+      <section id="intro" class="container">
+        <h4>🇿🇦 Heat maps by the people</h4>
         <p>
-          Heat maps built from anonymous reports sent from our mobile devices.
-          The map temperature reflects the number of recent reports in an area.
-          Click on the map to see a listing of reports near that point.
+          Heat maps built from reports sent from our mobile devices. The map
+          temperature reflects the number of recent reports in an area. Click on
+          the map to see a listing of reports near that point.
           <b>Your reports power this app</b>, use the menu above to send a
           report from your mobile device whenever you make one of the
           observations below.
         </p>
+      </section>
+      <section id="controls" class="container">
         <label for="obs">Show reports of</label>
         <select id="obs" name="obs" required onchange="loadHotSpots()">
           <option selected value="covid_vac">
@@ -146,42 +148,51 @@
           <option value="24">24 hours</option>
           <option selected value="720">30 days (reveals older reports)</option>
         </select>
-        <div id="map"></div>
-        <script
-          src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.2/heatmap.min.js"
-          integrity="sha256-9waIqGPUnXpt9C3BvXatjTzAfsP5svrnzFYa9Lmf0zU="
-          crossorigin="anonymous"
-        ></script>
-        <script src="https://cdn.jsdelivr.net/npm/leaflet-heatmap@1.0.0/leaflet-heatmap.min.js"></script>
-        <script>
-          window.onload = async function () {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            for (const [key, value] of urlParams) {
-              field = document.querySelector(`#${key}`);
-              if (field) field.value = value;
-            }
-
-            try {
-              if (!urlParams.has("lat")) {
-                const position = await getPosition();
-                lat = position.coords.latitude;
-                lng = position.coords.longitude;
-              } else {
-                lat = urlParams.get("lat");
-                lng = urlParams.get("lng");
-                zoom = 16;
-              }
-            } catch (err) {
-              console.log("Location not found, using default map centre.");
-            } finally {
-              createMap();
-              await loadHotSpots();
-              plotHotSpots();
-            }
-          };
-        </script>
       </section>
+      <section id="map-section" class="container">
+        <div id="map"></div>
+      </section>
+      <section id="disclaimer" class="container">
+        <h5>Disclaimer</h5>
+        The data on this web site is created by anonymous report submissions
+        which are not verified by the web site creators. The creators make no
+        representations or guarantees concerning the accuracy, or fitness for
+        purpose, of any data on this web site.
+      </section>
+      <script
+        src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.2/heatmap.min.js"
+        integrity="sha256-9waIqGPUnXpt9C3BvXatjTzAfsP5svrnzFYa9Lmf0zU="
+        crossorigin="anonymous"
+      ></script>
+      <script src="https://cdn.jsdelivr.net/npm/leaflet-heatmap@1.0.0/leaflet-heatmap.min.js"></script>
+      <script>
+        window.onload = async function () {
+          const urlParams = new URLSearchParams(window.location.search);
+
+          for (const [key, value] of urlParams) {
+            field = document.querySelector(`#${key}`);
+            if (field) field.value = value;
+          }
+
+          try {
+            if (!urlParams.has("lat")) {
+              const position = await getPosition();
+              lat = position.coords.latitude;
+              lng = position.coords.longitude;
+            } else {
+              lat = urlParams.get("lat");
+              lng = urlParams.get("lng");
+              zoom = 16;
+            }
+          } catch (err) {
+            console.log("Location not found, using default map centre.");
+          } finally {
+            createMap();
+            await loadHotSpots();
+            plotHotSpots();
+          }
+        };
+      </script>
     </main>
   </body>
 </html>

@@ -101,9 +101,11 @@
           </ul>
         </section>
       </nav>
-      <section id="docs" class="container">
-        <h4>🇿🇦 Heat maps for the people</h4>
+      <section id="intro" class="container">
+        <h4>🇿🇦 Heat maps by the people</h4>
         <p id="desc"></p>
+      </section>
+      <section id="controls" class="container">
         <label for="obs">List all reports of</label>
         <select id="obs" name="obs" required onchange="loadReportsTable(this)">
           <option selected value="covid_vac">
@@ -134,6 +136,8 @@
           <option value="20">20 km</option>
           <option value="100">100 km</option>
         </select>
+      </section>
+      <section id="listing" class="container">
         <table id="reportTable">
           <thead>
             <th>Reported</th>
