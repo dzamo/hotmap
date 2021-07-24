@@ -1,15 +1,3 @@
-OBS = {
-  testing: "Testing, ignore",
-  covid_vac: "COVID-19 vaccination for walk-ins",
-  supplies: "Charity or emergency relief supplies",
-  crime: "Suspicious or criminal activity",
-  dumping: "Illegal dumping, litter or eco hazards",
-  fire: "Uncontrolled fire",
-  flooding: "Flooding",
-  protest: "Protest or civil unrest",
-  road: "Impassable roads",
-};
-
 NOTES_EGS = {
   testing: "This field will be enabled when you select an observation.",
   covid_vac: "E.g. Midrand firestation, queue 200 people",
@@ -18,6 +6,7 @@ NOTES_EGS = {
   dumping: "E.g. building rubble",
   fire: "E.g. moving North",
   flooding: "E.g. high clearance vehicles only",
+  infra: "E.g. illegal electrical connection",
   protest: "E.g. roads blocked",
   road: "E.g. severe potholes",
 };
