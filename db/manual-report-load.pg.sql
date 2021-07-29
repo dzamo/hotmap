@@ -141,4 +141,8 @@ INSERT INTO public.report (lat, lng, notes, obs, sender_ip, created) values
 (-26.00917,28.21951, 'Themibsa Healthcare Centre', 'covid_vac', '127.0.0.1', '2021-07-17'),
 (-26.13392,28.26934, 'Christian Family Church', 'covid_vac', '127.0.0.1', '2021-07-17');
 
+INSERT INTO public.report (lat, lng, notes, obs, sender_ip, created) VALUES
+(-26.09769,28.05099, 'Rioting', 'protest', '127.0.0.1', '2021-07-28 11:00'),
+(-26.09769,28.05099, 'JMPD assault', 'crime', '127.0.0.1', '2021-07-28 11:00');
 
+select * from public.report order by id desc;
