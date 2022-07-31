@@ -86,10 +86,8 @@
         <h4>🇿🇦 Heat maps by the people</h4>
         <p>
           <b>N.B.</b> You must have location enabled on your device and
-          physically be near the site to send a valid report. Reports filed here
-          are anonymous, are freely accessible by the public and are not
-          forwarded to any emergency management service. You must still report
-          emergencies and crimes to the appropriate office.
+          physically be near the site to send an accurate report. Reports
+          filed here are anonymous and freely accessible on the Internet.
         </p>
       </section>
       <section class="container">
@@ -97,24 +95,14 @@
           <fieldset>
             <label for="obs">Near my current location I observed</label>
             <select id="obs" name="obs" required onchange="obsChanged(this)">
-              <option selected value="testing">
-                nothing, I'm just testing
-              </option>
-              <option value="covid_vac">
-                COVID-19 vaccination for walk-ins
-              </option>
-              <option value="supplies">
-                basic supplies like food, water or blankets
-              </option>
-              <option value="crime">suspicious or criminal activity</option>
-              <option value="dumping">
-                illegal dumping, litter or an eco hazard
-              </option>
-              <option value="fire">uncontrolled fire</option>
-              <option value="flooding">flooding</option>
-	          <option value="infra">a building or infrastructure safety hazard</option>
-              <option value="protest">protest or civil unrest</option>
-              <option value="road">an unsafe road or unsafe driving</option>
+              <option selected value="testing">nothing, I'm just testing</option>
+	          <option value="dumping">litter or illegal dumping</option>
+	          <option value="road">potholes or road damage</option>
+	          <option value="electricity">mains eletricity outage</option>
+	          <option value="water">mains water outage</option>
+	          <option value="gas">mains gas outage</option>
+	          <option value="bird">an interesting bird species</option>
+	          <option value="crime">suspicious or criminal activity</option>
             </select>
 
             <label for="notes">Extra notes (optional)</label>

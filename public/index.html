@@ -40,7 +40,7 @@
       var heatmapLayer,
         lat = -26.1069,
         lng = 28.104,
-        zoom = 10,
+        zoom = 14,
         hotspots = [];
 
       function createMap() {
@@ -126,28 +126,20 @@
       <section id="controls" class="container">
         <label for="obs">Show reports of</label>
         <select id="obs" name="obs" required onchange="loadHotSpots()">
-          <option selected value="covid_vac">
-            COVID-19 vaccination for walk-ins
-          </option>
-          <option value="supplies">
-            basic supplies like food, water or blankets
-          </option>
+          <option selected value="dumping">litter or illegal dumping</option>
+          <option value="road">potholes or road damage</option>
+          <option value="electricity">mains eletricity outage</option>
+          <option value="water">mains water outage</option>
+          <option value="gas">mains gas outage</option>
+          <option value="bird">an interesting bird species</option>
           <option value="crime">suspicious or criminal activity</option>
-          <option value="dumping">
-            illegal dumping, litter or an eco hazard
-          </option>
-          <option value="fire">uncontrolled fire</option>
-          <option value="flooding">flooding</option>
-          <option value="infra">a building or infrastructure safety hazard</option>
-          <option value="protest">protest or civil unrest</option>
-          <option value="road">an unsafe road or unsafe driving</option>
         </select>
-        <label for="period">halving in temperature every</label>
+        <label for="period">that arrived in the last few</label>
         <select id="period" name="period" required onchange="plotHotSpots()">
-          <option value="4">4 hours (least visibility of older reports)</option>
-          <option value="24">24 hours</option>
-          <option value="168">7 days</option>
-          <option selected value="720">30 days (most visibility of older reports)</option>
+          <option value="1">hours</option>
+          <option selected value="24">days</option>
+          <option value="168">weeks</option>
+          <option value="720">months</option>
         </select>
       </section>
       <section id="map-section" class="container">
@@ -156,9 +148,9 @@
       <section id="disclaimer" class="container">
         <h5>Disclaimer</h5>
         The data on this web site is created by anonymous report submissions
-        which are not verified by the web site creators. The creators make no
-        representations or guarantees concerning the accuracy, or fitness for
-        purpose, of any data on this web site.
+        which are not verified by the web site creator. The creator makes no
+        representations or guarantees concerning the accuracy or fitness for
+        purpose of any data on this web site.
       </section>
       <script
         src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.2/heatmap.min.js"

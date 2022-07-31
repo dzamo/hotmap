@@ -25,7 +25,7 @@ select
 from
 	report
 --where
---	obs = 'covid_vac'
+--	obs = 'road'
 order by
 	id desc;
 
